@@ -1,3 +1,6 @@
+/* eslint-disable indent */
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable no-undef */
 const request = require('supertest');
 const bcrypt = require('bcrypt');
 const app = require('../index');
@@ -5,28 +8,29 @@ const User = require('../database/models/users');
 const mongoose = require('../database/dbConection');
 const UserService = require('../database/services/users');
 const RecipeService = require('../database/services/recipes');
+
 let id;
 let token;
 describe('test the recipes API', () => {
     beforeAll(async () => {
-        //create a test user
+        // create a test user
         const password = bcrypt.hashSync('okay', 10);
         await User.create({
             username: 'admin',
-            password
+            password,
         });
     });
     afterAll(async () => {
         await User.deleteMany();
         mongoose.disconnect();
     });
-    //test login
+    // test login
     describe('POST/login', () => {
         it('authenticate user and sign him in', async () => {
-            //DATA YOU WANT TO SAVE TO DB
+            // DATA YOU WANT TO SAVE TO DB
             const user = {
                 username: 'admin',
-                password: 'okay'
+                password: 'okay',
             };
             const res = await request(app)
                 .post('/login')
@@ -39,16 +43,16 @@ describe('test the recipes API', () => {
                     success: true,
                     data: expect.objectContaining({
                         id: res.body.data.id,
-                        username: res.body.data.username
+                        username: res.body.data.username,
                     }),
                 }),
             );
         });
         it('do not sign him in, password can not be empty',
             async () => {
-                //DATA YOU WANT TO SAVE TO DB
+                // DATA YOU WANT TO SAVE TO DB
                 const user = {
-                    username: 'admin'
+                    username: 'admin',
                 };
                 const res = await request(app)
                     .post('/login')
@@ -57,15 +61,15 @@ describe('test the recipes API', () => {
                 expect(res.body).toEqual(
                     expect.objectContaining({
                         success: false,
-                        message: 'username or password can not be empty'
+                        message: 'username or password can not be empty',
                     }),
                 );
             });
         it('do not sign him in,username field can not be empty',
             async () => {
-                //DATA YOU WANT TO SAVE TO DB
+                // DATA YOU WANT TO SAVE TO DB
                 const user = {
-                    password: 'okay'
+                    password: 'okay',
                 };
                 const res = await request(app)
                     .post('/login')
@@ -74,16 +78,16 @@ describe('test the recipes API', () => {
                 expect(res.body).toEqual(
                     expect.objectContaining({
                         success: false,
-                        message: 'username or password can not be empty'
+                        message: 'username or password can not be empty',
                     }),
                 );
             });
         it('do not sign him in, username does not exist',
             async () => {
-                //DATA YOU WANT TO SAVE TO DB
+                // DATA YOU WANT TO SAVE TO DB
                 const user = {
                     username: 'chii',
-                    password: 'okay'
+                    password: 'okay',
                 };
                 const res = await request(app)
                     .post('/login')
@@ -92,15 +96,15 @@ describe('test the recipes API', () => {
                 expect(res.body).toEqual(
                     expect.objectContaining({
                         success: false,
-                        message: 'Incorrect username or password'
+                        message: 'Incorrect username or password',
                     }),
                 );
             });
         it('do not sign him in, incorrect password', async () => {
-            //DATA YOU WANT TO SAVE TO DB
+            // DATA YOU WANT TO SAVE TO DB
             const user = {
                 username: 'admin',
-                password: 'okay1'
+                password: 'okay1',
             };
             const res = await request(app)
                 .post('/login')
@@ -109,16 +113,16 @@ describe('test the recipes API', () => {
             expect(res.body).toEqual(
                 expect.objectContaining({
                     success: false,
-                    message: 'Incorrect username or password'
+                    message: 'Incorrect username or password',
                 }),
             );
         });
         it('do not sign him in, internal server error',
             async () => {
-                //DATA YOU WANT TO SAVE TO DB
+                // DATA YOU WANT TO SAVE TO DB
                 const user = {
                     username: 'admin',
-                    password: 'okay'
+                    password: 'okay',
                 };
                 jest.spyOn(UserService, 'findByUsername')
                     .mockRejectedValueOnce(new Error());
@@ -129,20 +133,20 @@ describe('test the recipes API', () => {
                 expect(res.body).toEqual(
                     expect.objectContaining({
                         success: false,
-                        message: 'login failed.'
+                        message: 'login failed.',
                     }),
                 );
             });
     });
-    //test create recipes
+    // test create recipes
     describe('POST/recipes', () => {
         it('it should save new recipe to db',
             async () => {
-                //DATA YOU WANT TO SAVE TO DB
+                // DATA YOU WANT TO SAVE TO DB
                 const recipe = {
                     name: 'chicken nuggets',
                     difficulty: 2,
-                    vegetarian: true
+                    vegetarian: true,
                 };
                 const res = await request(app)
                     .post('/recipes')
@@ -152,18 +156,18 @@ describe('test the recipes API', () => {
                 expect(res.body).toEqual(
                     expect.objectContaining({
                         success: true,
-                        data: expect.any(Object)
+                        data: expect.any(Object),
                     }),
                 );
                 id = res.body.data._id;
             });
         it('it should not save new recipe to db,incalid vegetarian value',
             async () => {
-                //DATA YOU WANT TO SAVE TO DB
+                // DATA YOU WANT TO SAVE TO DB
                 const recipe = {
                     name: 'chicken nuggets',
                     difficulty: 3,
-                    vegetarian: 'true'
+                    vegetarian: 'true',
                 };
                 const res = await request(app)
                     .post('/recipes')
@@ -173,16 +177,16 @@ describe('test the recipes API', () => {
                 expect(res.body).toEqual(
                     expect.objectContaining({
                         success: false,
-                        message: 'vegetarian field should be boolean'
+                        message: 'vegetarian field should be boolean',
                     }),
                 );
             });
         it('it should not save new user to db,empty name field',
             async () => {
-                //DATA YOU WANT TO SAVE TO DB
+                // DATA YOU WANT TO SAVE TO DB
                 const recipe = {
                     difficulty: 2,
-                    vegetarian: true
+                    vegetarian: true,
                 };
                 const res = await request(app)
                     .post('/recipes')
@@ -192,17 +196,17 @@ describe('test the recipes API', () => {
                 expect(res.body).toEqual(
                     expect.objectContaining({
                         success: false,
-                        message: 'name field can not be empty'
+                        message: 'name field can not be empty',
                     }),
                 );
             });
         it('it should not save new recipe to db,invalid difficulty field',
             async () => {
-                //DATA YOU WANT TO SAVE TO DB
+                // DATA YOU WANT TO SAVE TO DB
                 const recipe = {
                     name: 'jollof rice',
                     difficulty: '2',
-                    vegetarian: true
+                    vegetarian: true,
                 };
                 const res = await request(app)
                     .post('/recipes')
@@ -212,36 +216,36 @@ describe('test the recipes API', () => {
                 expect(res.body).toEqual(
                     expect.objectContaining({
                         success: false,
-                        message: 'difficulty field should be a number'
+                        message: 'difficulty field should be a number',
                     }),
                 );
             });
         it('it should not save new recipe to db,invalid token',
             async () => {
-                //DATA YOU WANT TO SAVE TO DB
+                // DATA YOU WANT TO SAVE TO DB
                 const recipe = {
                     name: 'chicken nuggets',
                     difficulty: 2,
-                    vegetarian: true
+                    vegetarian: true,
                 };
                 const res = await request(app)
                     .post('/recipes')
                     .send(recipe)
-                    .set('Authorization', `Bearer siuogusire7893034pt4`);
+                    .set('Authorization', 'Bearer siuogusire7893034pt4');
                 expect(res.statusCode).toEqual(403);
                 expect(res.body).toEqual(
                     expect.objectContaining({
-                        message: 'Unauthorized'
+                        message: 'Unauthorized',
                     }),
                 );
             });
         it('it should not save new recipe to db, internal server error',
             async () => {
-                //DATA YOU WANT TO SAVE TO DB
+                // DATA YOU WANT TO SAVE TO DB
                 const recipes = {
                     name: 'chicken nuggets',
                     difficulty: 2,
-                    vegetarian: true
+                    vegetarian: true,
                 };
                 jest.spyOn(RecipeService, 'saveRecipes')
                     .mockRejectedValueOnce(new Error());
@@ -253,12 +257,12 @@ describe('test the recipes API', () => {
                 expect(res.body).toEqual(
                     expect.objectContaining({
                         success: false,
-                        message: 'Failed to save recipes!'
+                        message: 'Failed to save recipes!',
                     }),
                 );
             });
     });
-    //test get all recipe
+    // test get all recipe
     describe('GET/recipes', () => {
         it('it should retrieve all the recipes in db',
             async () => {
@@ -283,12 +287,12 @@ describe('test the recipes API', () => {
                 expect(res.body).toEqual(
                     expect.objectContaining({
                         success: false,
-                        message: 'Some error occurred while retrieving recipes.'
+                        message: 'Some error occurred while retrieving recipes.',
                     }),
                 );
             });
     });
-    //test get a particular recipe
+    // test get a particular recipe
     describe('GET/recipes/:id', () => {
         it('Retrieve a specified recipes in db',
             async () => {
@@ -298,7 +302,7 @@ describe('test the recipes API', () => {
                 expect(res.body).toEqual(
                     expect.objectContaining({
                         success: true,
-                        data: expect.any(Object)
+                        data: expect.any(Object),
                     }),
                 );
             });
@@ -310,33 +314,34 @@ describe('test the recipes API', () => {
                 expect(res.body).toEqual(
                     expect.objectContaining({
                         success: false,
-                        message: 'Recipe with id 282hsowj8byewiuewgfg6732i2 does not exist'
+                        message: 'Recipe with id 282hsowj8byewiuewgfg6732i2 does not exist',
                     }),
                 );
             });
         it('it should not retrieve any recipe from db, internal server error',
             async () => {
-                //DATA YOU WANT TO SAVE TO DB
+                // DATA YOU WANT TO SAVE TO DB
                 jest.spyOn(RecipeService, 'fetchById')
                     .mockRejectedValueOnce(new Error());
                 const res = await request(app)
                     .get(`/recipes/${id}`);
                 expect(res.statusCode).toEqual(500);
+                // eslint-disable-next-line no-undef
                 expect(res.body).toEqual(
                     expect.objectContaining({
                         success: false,
-                        message: 'Some error occurred while retrieving recipe details.'
+                        message: 'Some error occurred while retrieving recipe details.',
                     }),
                 );
             });
     });
-    //test update recipe
+    // test update recipe
     describe('PATCH/recipes/:id', () => {
         it('update the recipe record in db',
             async () => {
-                //DATA YOU WANT TO UPDATE IN DB
+                // DATA YOU WANT TO UPDATE IN DB
                 const recipes = {
-                    name: 'chicken nuggets'
+                    name: 'chicken nuggets',
                 };
                 const res = await request(app)
                     .patch(`/recipes/${id}`)
@@ -346,7 +351,7 @@ describe('test the recipes API', () => {
                 expect(res.body).toEqual(
                     expect.objectContaining({
                         success: true,
-                        data: expect.any(Object)
+                        data: expect.any(Object),
                     }),
                 );
             });
@@ -355,7 +360,7 @@ describe('test the recipes API', () => {
                 // DATA YOU WANT TO UPDATE IN DB
                 const recipe = {
                     name: 'jollof rice',
-                    difficulty: '2'
+                    difficulty: '2',
                 };
                 const res = await request(app)
                     .patch(`/recipes/${id}`)
@@ -365,7 +370,7 @@ describe('test the recipes API', () => {
                 expect(res.body).toEqual(
                     expect.objectContaining({
                         success: false,
-                        message: 'difficulty field should be a number'
+                        message: 'difficulty field should be a number',
                     }),
                 );
             });
@@ -374,7 +379,7 @@ describe('test the recipes API', () => {
                 // DATA YOU WANT TO UPDATE IN DB
                 const recipe = {
                     difficulty: 3,
-                    vegetarian: 'true'
+                    vegetarian: 'true',
                 };
                 const res = await request(app)
                     .patch(`/recipes/${id}`)
@@ -384,15 +389,15 @@ describe('test the recipes API', () => {
                 expect(res.body).toEqual(
                     expect.objectContaining({
                         success: false,
-                        message: 'vegetarian field should be boolean'
+                        message: 'vegetarian field should be boolean',
                     }),
                 );
             });
         it('it should not update recipe in db, invalid id passed',
             async () => {
-                //DATA YOU WANT TO UPDATE IN DB
+                // DATA YOU WANT TO UPDATE IN DB
                 const recipe = {
-                    difficulty: 3
+                    difficulty: 3,
                 };
                 const res = await request(app)
                     .patch('/recipes/uowe8ww78wowfonfwh27823t67200')
@@ -402,7 +407,7 @@ describe('test the recipes API', () => {
                 expect(res.body).toEqual(
                     expect.objectContaining({
                         success: false,
-                        message: 'Recipe with id uowe8ww78wowfonfwh27823t67200 does not exist'
+                        message: 'Recipe with id uowe8ww78wowfonfwh27823t67200 does not exist',
                     }),
                 );
             });
@@ -410,7 +415,7 @@ describe('test the recipes API', () => {
             async () => {
                 // DATA YOU WANT TO UPDATE IN DB
                 const recipes = {
-                    name: 'chicken nuggets'
+                    name: 'chicken nuggets',
                 };
                 const res = await request(app)
                     .patch(`/recipes/${id}`)
@@ -419,7 +424,7 @@ describe('test the recipes API', () => {
                 expect(res.statusCode).toEqual(403);
                 expect(res.body).toEqual(
                     expect.objectContaining({
-                        message: 'Unauthorized'
+                        message: 'Unauthorized',
                     }),
                 );
             });
@@ -435,15 +440,15 @@ describe('test the recipes API', () => {
                 expect(res.body).toEqual(
                     expect.objectContaining({
                         success: false,
-                        message: 'field should not be empty'
+                        message: 'field should not be empty',
                     }),
                 );
             });
         it('it should not update recipe in db,internal server error',
             async () => {
-                //DATA YOU WANT TO UPDATE IN DB
+                // DATA YOU WANT TO UPDATE IN DB
                 const recipes = {
-                    name: 'chicken nuggets'
+                    name: 'chicken nuggets',
                 };
                 jest.spyOn(RecipeService, 'fetchByIdAndUpdate')
                     .mockRejectedValueOnce(new Error());
@@ -455,12 +460,12 @@ describe('test the recipes API', () => {
                 expect(res.body).toEqual(
                     expect.objectContaining({
                         success: false,
-                        message: 'An error occured while updating recipe'
+                        message: 'An error occured while updating recipe',
                     }),
                 );
             });
     });
-    //test delete recipe
+    // test delete recipe
     describe('DELETE /recipes/:id', () => {
         it('Delete the specified recipe', async () => {
             const res = await request(app)
@@ -470,7 +475,7 @@ describe('test the recipes API', () => {
             expect(res.body).toEqual(
                 expect.objectContaining({
                     success: true,
-                    message: 'Recipe successfully deleted'
+                    message: 'Recipe successfully deleted',
                 }),
             );
         });
@@ -478,11 +483,11 @@ describe('test the recipes API', () => {
             async () => {
                 const res = await request(app)
                     .delete(`/recipes/${id}`)
-                    .set('Authorization', `Bearer dnsosuew8w9e729203332`);
+                    .set('Authorization', 'Bearer dnsosuew8w9e729203332');
                 expect(res.statusCode).toEqual(403);
                 expect(res.body).toEqual(
                     expect.objectContaining({
-                        message: 'Unauthorized'
+                        message: 'Unauthorized',
                     }),
                 );
             });
@@ -497,7 +502,7 @@ describe('test the recipes API', () => {
                 expect(res.body).toEqual(
                     expect.objectContaining({
                         success: false,
-                        message: 'An error occured while deleting recipe'
+                        message: 'An error occured while deleting recipe',
                     }),
                 );
             });
